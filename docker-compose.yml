@@ -29,16 +29,29 @@ services:
       - GF_SERVER_ROOT_URL=https://grafana.deepestvibe.com
     volumes:
       - grafana-data:/var/lib/grafana
+    networks:
+      - default
+      - coolify
+    expose:
+      - "3000"
     depends_on:
       - loki
     restart: unless-stopped
 
     labels:
       - traefik.enable=true
+      - traefik.docker.network=coolify
       - traefik.http.routers.grafana.rule=Host(`grafana.deepestvibe.com`)
       - traefik.http.routers.grafana.entrypoints=https
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+      - traefik.http.routers.grafana.service=grafana
       - traefik.http.services.grafana.loadbalancer.server.port=3000
 
 volumes:
   loki-data:
   grafana-data:
+
+networks:
+  coolify:
+    external: true
