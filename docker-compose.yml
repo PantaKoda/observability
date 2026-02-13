@@ -23,15 +23,21 @@ services:
 
   grafana:
     image: grafana/grafana:10.4.2
-    ports:
-      - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_DOMAIN=grafana.deepestvibe.com
+      - GF_SERVER_ROOT_URL=https://grafana.deepestvibe.com
     volumes:
       - grafana-data:/var/lib/grafana
     depends_on:
       - loki
     restart: unless-stopped
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.grafana.rule=Host(`grafana.deepestvibe.com`)
+      - traefik.http.routers.grafana.entrypoints=https
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
 
 volumes:
   loki-data:
